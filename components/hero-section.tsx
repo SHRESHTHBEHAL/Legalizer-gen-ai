@@ -1,7 +1,29 @@
+"use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Scale } from "lucide-react"
 
 export function HeroSection() {
+  const [loading, setLoading] = useState(false);
+
+  const handleGetStarted = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/run-app-py", { method: "POST" });
+      const data = await res.json();
+      if (data.success && data.streamlitUrl) {
+        window.open(data.streamlitUrl, '_blank');
+      } else {
+        alert(data.error || "Service unavailable");
+      }
+    } catch (e) {
+      alert("Service temporarily unavailable");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background to-card py-20 lg:py-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,12 +44,15 @@ export function HeroSection() {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <a href="http://localhost:8514" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" className="text-lg px-12 py-8">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </a>
+            <Button 
+              size="lg" 
+              className="text-lg px-12 py-8" 
+              onClick={handleGetStarted}
+              disabled={loading}
+            >
+              {loading ? "Opening..." : "Get Started"}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
 
           <div className="mt-12 text-sm text-muted-foreground">
